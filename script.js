@@ -15,7 +15,7 @@ const questions = [
     correct: 2
   },
   {
-    question: "What is the largest ocean on Earth?",
+    question: "What is the largest country by area?",
     options: ["Atlantic", "Indian", "Arctic", "Pacific"],
     correct: 3
   },
