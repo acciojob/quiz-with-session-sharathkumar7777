@@ -2,58 +2,54 @@ const questionsDiv = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-// Quiz data
 const questions = [
   {
-    question: "Question 1",
-    options: ["A", "B", "C", "D"],
-    correct: 0
-  },
-  {
-    question: "Question 2",
-    options: ["A", "B", "C", "D"],
-    correct: 1
-  },
-  {
-    question: "Question 3",
-    options: ["A", "B", "C", "D"],
+    question: "What is the capital of France?",
+    options: ["Berlin", "Madrid", "Paris", "Rome"],
     correct: 2
   },
   {
-    question: "Question 4",
-    options: ["A", "B", "C", "D"],
+    question: "Which planet is known as the Red Planet?",
+    options: ["Earth", "Mars", "Jupiter", "Venus"],
+    correct: 1
+  },
+  {
+    question: "Who wrote 'Hamlet'?",
+    options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Jane Austen"],
+    correct: 1
+  },
+  {
+    question: "What is the largest ocean on Earth?",
+    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
     correct: 3
   },
   {
-    question: "Question 5",
-    options: ["A", "B", "C", "D"],
-    correct: 0
+    question: "Which language runs in a web browser?",
+    options: ["Java", "C", "Python", "JavaScript"],
+    correct: 3
   }
 ];
 
-// Load progress from sessionStorage
 const savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
-// Render questions
 function renderQuestions() {
   questionsDiv.innerHTML = "";
 
   questions.forEach((q, qIndex) => {
     const qDiv = document.createElement("div");
 
-    const title = document.createElement("p");
-    title.textContent = q.question;
-    qDiv.appendChild(title);
+    const p = document.createElement("p");
+    p.textContent = q.question;
+    qDiv.appendChild(p);
 
     q.options.forEach((opt, optIndex) => {
       const label = document.createElement("label");
-
       const radio = document.createElement("input");
+
       radio.type = "radio";
       radio.name = `question-${qIndex}`;
       radio.value = optIndex;
 
-      // Restore checked state
       if (savedProgress[qIndex] == optIndex) {
         radio.checked = true;
       }
@@ -74,25 +70,20 @@ function renderQuestions() {
   });
 }
 
-// Submit quiz
 submitBtn.addEventListener("click", () => {
   let score = 0;
 
-  questions.forEach((q, index) => {
-    if (savedProgress[index] == q.correct) {
-      score++;
-    }
+  questions.forEach((q, i) => {
+    if (savedProgress[i] == q.correct) score++;
   });
 
   scoreDiv.textContent = `Your score is ${score} out of 5.`;
   localStorage.setItem("score", score);
 });
 
-// Initial render
 renderQuestions();
 
-// Restore score after refresh (if exists)
-const storedScore = localStorage.getItem("score");
-if (storedScore !== null) {
-  scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
+const savedScore = localStorage.getItem("score");
+if (savedScore !== null) {
+  scoreDiv.textContent = `Your score is ${savedScore} out of 5.`;
 }
