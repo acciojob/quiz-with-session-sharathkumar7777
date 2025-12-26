@@ -20,7 +20,7 @@ const questions = [
     correct: 3
   },
   {
-    question: "Which planet is known as the Red Planet?",
+    question: "Which is the largest planet in our solar system?",
     options: ["Earth", "Mars", "Jupiter", "Venus"],
     correct: 1
   },
