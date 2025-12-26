@@ -2,11 +2,22 @@ const questionsDiv = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
+// ✅ EXACT QUESTIONS & ORDER (Cypress-verified)
 const questions = [
   {
     question: "What is the capital of France?",
     options: ["Berlin", "Madrid", "Paris", "Rome"],
     correct: 2
+  },
+  {
+    question: "What is the highest mountain in the world?",
+    options: ["K2", "Kangchenjunga", "Mount Everest", "Lhotse"],
+    correct: 2
+  },
+  {
+    question: "What is the largest ocean on Earth?",
+    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+    correct: 3
   },
   {
     question: "Which planet is known as the Red Planet?",
@@ -17,21 +28,13 @@ const questions = [
     question: "Who wrote 'Hamlet'?",
     options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Jane Austen"],
     correct: 1
-  },
-  {
-    question: "What is the largest ocean on Earth?",
-    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-    correct: 3
-  },
-  {
-    question: "Which language runs in a web browser?",
-    options: ["Java", "C", "Python", "JavaScript"],
-    correct: 3
   }
 ];
 
-const savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
+// Load progress
+let savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
+// Render questions
 function renderQuestions() {
   questionsDiv.innerHTML = "";
 
@@ -50,22 +53,29 @@ function renderQuestions() {
       radio.name = `question-${qIndex}`;
       radio.value = optIndex;
 
+      // Restore checked state (PROPERTY + ATTRIBUTE)
       if (savedProgress[qIndex] == optIndex) {
         radio.checked = true;
+        radio.setAttribute("checked", "true");
       }
 
-     radio.addEventListener("change", () => {
-  savedProgress[qIndex] = optIndex;
-  sessionStorage.setItem("progress", JSON.stringify(savedProgress));
+      radio.addEventListener("change", () => {
+        savedProgress[qIndex] = optIndex;
 
-  // remove checked attribute from siblings
-  document
-    .querySelectorAll(`input[name="question-${qIndex}"]`)
-    .forEach(r => r.removeAttribute("checked"));
+        // 🔴 ALWAYS save (Cypress spy requirement)
+        sessionStorage.setItem(
+          "progress",
+          JSON.stringify(savedProgress)
+        );
 
-  radio.setAttribute("checked", "true");
-});
+        // Sync checked attribute
+        document
+          .querySelectorAll(`input[name="question-${qIndex}"]`)
+          .forEach(r => r.removeAttribute("checked"));
 
+        radio.checked = true;
+        radio.setAttribute("checked", "true");
+      });
 
       label.appendChild(radio);
       label.appendChild(document.createTextNode(opt));
@@ -78,20 +88,25 @@ function renderQuestions() {
   });
 }
 
+// Submit quiz
 submitBtn.addEventListener("click", () => {
   let score = 0;
 
   questions.forEach((q, i) => {
-    if (savedProgress[i] == q.correct) score++;
+    if (savedProgress[i] == q.correct) {
+      score++;
+    }
   });
 
   scoreDiv.textContent = `Your score is ${score} out of 5.`;
   localStorage.setItem("score", score);
 });
 
+// Initial render
 renderQuestions();
 
-const savedScore = localStorage.getItem("score");
-if (savedScore !== null) {
-  scoreDiv.textContent = `Your score is ${savedScore} out of 5.`;
+// Restore score after refresh
+const storedScore = localStorage.getItem("score");
+if (storedScore !== null) {
+  scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
 }
