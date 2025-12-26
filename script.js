@@ -54,10 +54,18 @@ function renderQuestions() {
         radio.checked = true;
       }
 
-      radio.addEventListener("change", () => {
-        savedProgress[qIndex] = optIndex;
-        sessionStorage.setItem("progress", JSON.stringify(savedProgress));
-      });
+     radio.addEventListener("change", () => {
+  savedProgress[qIndex] = optIndex;
+  sessionStorage.setItem("progress", JSON.stringify(savedProgress));
+
+  // remove checked attribute from siblings
+  document
+    .querySelectorAll(`input[name="question-${qIndex}"]`)
+    .forEach(r => r.removeAttribute("checked"));
+
+  radio.setAttribute("checked", "true");
+});
+
 
       label.appendChild(radio);
       label.appendChild(document.createTextNode(opt));
