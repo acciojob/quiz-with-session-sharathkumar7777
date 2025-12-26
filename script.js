@@ -1,56 +1,98 @@
-//your JS code here.
+const questionsDiv = document.getElementById("questions");
+const submitBtn = document.getElementById("submit");
+const scoreDiv = document.getElementById("score");
 
-// Do not change code below this line
-// This code will just display the questions to the screen
+// Quiz data
 const questions = [
   {
-    question: "What is the capital of France?",
-    choices: ["Paris", "London", "Berlin", "Madrid"],
-    answer: "Paris",
+    question: "Question 1",
+    options: ["A", "B", "C", "D"],
+    correct: 0
   },
   {
-    question: "What is the highest mountain in the world?",
-    choices: ["Everest", "Kilimanjaro", "Denali", "Matterhorn"],
-    answer: "Everest",
+    question: "Question 2",
+    options: ["A", "B", "C", "D"],
+    correct: 1
   },
   {
-    question: "What is the largest country by area?",
-    choices: ["Russia", "China", "Canada", "United States"],
-    answer: "Russia",
+    question: "Question 3",
+    options: ["A", "B", "C", "D"],
+    correct: 2
   },
   {
-    question: "Which is the largest planet in our solar system?",
-    choices: ["Earth", "Jupiter", "Mars"],
-    answer: "Jupiter",
+    question: "Question 4",
+    options: ["A", "B", "C", "D"],
+    correct: 3
   },
   {
-    question: "What is the capital of Canada?",
-    choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
-    answer: "Ottawa",
-  },
+    question: "Question 5",
+    options: ["A", "B", "C", "D"],
+    correct: 0
+  }
 ];
 
-// Display the quiz questions and choices
+// Load progress from sessionStorage
+const savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
+
+// Render questions
 function renderQuestions() {
-  for (let i = 0; i < questions.length; i++) {
-    const question = questions[i];
-    const questionElement = document.createElement("div");
-    const questionText = document.createTextNode(question.question);
-    questionElement.appendChild(questionText);
-    for (let j = 0; j < question.choices.length; j++) {
-      const choice = question.choices[j];
-      const choiceElement = document.createElement("input");
-      choiceElement.setAttribute("type", "radio");
-      choiceElement.setAttribute("name", `question-${i}`);
-      choiceElement.setAttribute("value", choice);
-      if (userAnswers[i] === choice) {
-        choiceElement.setAttribute("checked", true);
+  questionsDiv.innerHTML = "";
+
+  questions.forEach((q, qIndex) => {
+    const qDiv = document.createElement("div");
+
+    const title = document.createElement("p");
+    title.textContent = q.question;
+    qDiv.appendChild(title);
+
+    q.options.forEach((opt, optIndex) => {
+      const label = document.createElement("label");
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `question-${qIndex}`;
+      radio.value = optIndex;
+
+      // Restore checked state
+      if (savedProgress[qIndex] == optIndex) {
+        radio.checked = true;
       }
-      const choiceText = document.createTextNode(choice);
-      questionElement.appendChild(choiceElement);
-      questionElement.appendChild(choiceText);
-    }
-    questionsElement.appendChild(questionElement);
-  }
+
+      radio.addEventListener("change", () => {
+        savedProgress[qIndex] = optIndex;
+        sessionStorage.setItem("progress", JSON.stringify(savedProgress));
+      });
+
+      label.appendChild(radio);
+      label.appendChild(document.createTextNode(opt));
+
+      qDiv.appendChild(label);
+      qDiv.appendChild(document.createElement("br"));
+    });
+
+    questionsDiv.appendChild(qDiv);
+  });
 }
+
+// Submit quiz
+submitBtn.addEventListener("click", () => {
+  let score = 0;
+
+  questions.forEach((q, index) => {
+    if (savedProgress[index] == q.correct) {
+      score++;
+    }
+  });
+
+  scoreDiv.textContent = `Your score is ${score} out of 5.`;
+  localStorage.setItem("score", score);
+});
+
+// Initial render
 renderQuestions();
+
+// Restore score after refresh (if exists)
+const storedScore = localStorage.getItem("score");
+if (storedScore !== null) {
+  scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
+}
