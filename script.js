@@ -1,28 +1,32 @@
-// ---------------- QUESTIONS DATA ----------------
 const quizData = [
   {
-    question: "Question 1",
-    options: ["A", "B", "C", "D"],
+    question: "What is the capital of France?",
+    options: ["Paris", "London", "Berlin", "Madrid"],
     answer: 0
   },
   {
-    question: "Question 2",
-    options: ["A", "B", "C", "D"],
+    question: "What is 2 + 2?",
+    options: ["3", "4", "5", "6"],
     answer: 1
   },
   {
-    question: "Question 3",
-    options: ["A", "B", "C", "D"],
-    answer: 2
+    question: "Which planet is known as the Red Planet?",
+    options: ["Earth", "Mars", "Jupiter", "Venus"],
+    answer: 1
   },
   {
-    question: "Question 4",
-    options: ["A", "B", "C", "D"],
+    question: "Which is the largest ocean on Earth?",
+    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
     answer: 3
   },
   {
-    question: "Question 5",
-    options: ["A", "B", "C", "D"],
+    question: "What does HTML stand for?",
+    options: [
+      "HyperText Markup Language",
+      "HighText Machine Language",
+      "HyperTool Markup Language",
+      "None of the above"
+    ],
     answer: 0
   }
 ];
@@ -31,7 +35,6 @@ const questionsDiv = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-// ---------------- LOAD SAVED PROGRESS ----------------
 let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
 // ---------------- RENDER QUESTIONS ----------------
@@ -53,7 +56,6 @@ function renderQuestions() {
       input.name = `question-${qIndex}`;
       input.value = oIndex;
 
-      // Restore checked state
       if (progress[qIndex] == oIndex) {
         input.checked = true;
       }
@@ -93,5 +95,4 @@ if (storedScore !== null) {
   scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
 }
 
-// Initial render
 renderQuestions();
