@@ -1,85 +1,70 @@
+// ---------------- QUESTIONS DATA ----------------
+const quizData = [
+  {
+    question: "Question 1",
+    options: ["A", "B", "C", "D"],
+    answer: 0
+  },
+  {
+    question: "Question 2",
+    options: ["A", "B", "C", "D"],
+    answer: 1
+  },
+  {
+    question: "Question 3",
+    options: ["A", "B", "C", "D"],
+    answer: 2
+  },
+  {
+    question: "Question 4",
+    options: ["A", "B", "C", "D"],
+    answer: 3
+  },
+  {
+    question: "Question 5",
+    options: ["A", "B", "C", "D"],
+    answer: 0
+  }
+];
+
 const questionsDiv = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-// ✅ EXACT QUESTIONS & ORDER (Cypress-verified)
-const questions = [
-  {
-    question: "What is the capital of France?",
-    options: ["Berlin", "Madrid", "Paris", "Rome"],
-    correct: 2
-  },
-  {
-    question: "What is the highest mountain in the world?",
-    options: ["K2", "Kangchenjunga", "Mount Everest", "Lhotse"],
-    correct: 2
-  },
-  {
-    question: "What is the largest country by area?",
-    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-    correct: 3
-  },
-  {
-    question: "Which is the largest planet in our solar system?",
-    options: ["Earth", "Mars", "Jupiter", "Venus"],
-    correct: 1
-  },
-  {
-    question: "Who wrote 'Hamlet'?",
-    options: ["Charles Dickens", "William Shakespeare", "Mark Twain", "Jane Austen"],
-    correct: 1
-  }
-];
+// ---------------- LOAD SAVED PROGRESS ----------------
+let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
-// Load progress
-let savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
-
-// Render questions
+// ---------------- RENDER QUESTIONS ----------------
 function renderQuestions() {
   questionsDiv.innerHTML = "";
 
-  questions.forEach((q, qIndex) => {
+  quizData.forEach((q, qIndex) => {
     const qDiv = document.createElement("div");
 
-    const p = document.createElement("p");
-    p.textContent = q.question;
-    qDiv.appendChild(p);
+    const qTitle = document.createElement("p");
+    qTitle.textContent = q.question;
+    qDiv.appendChild(qTitle);
 
-    q.options.forEach((opt, optIndex) => {
+    q.options.forEach((option, oIndex) => {
       const label = document.createElement("label");
-      const radio = document.createElement("input");
 
-      radio.type = "radio";
-      radio.name = `question-${qIndex}`;
-      radio.value = optIndex;
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = `question-${qIndex}`;
+      input.value = oIndex;
 
-      // Restore checked state (PROPERTY + ATTRIBUTE)
-      if (savedProgress[qIndex] == optIndex) {
-        radio.checked = true;
-        radio.setAttribute("checked", "true");
+      // Restore checked state
+      if (progress[qIndex] == oIndex) {
+        input.checked = true;
       }
 
-      radio.addEventListener("change", () => {
-        savedProgress[qIndex] = optIndex;
-
-        // 🔴 ALWAYS save (Cypress spy requirement)
-        sessionStorage.setItem(
-          "progress",
-          JSON.stringify(savedProgress)
-        );
-
-        // Sync checked attribute
-        document
-          .querySelectorAll(`input[name="question-${qIndex}"]`)
-          .forEach(r => r.removeAttribute("checked"));
-
-        radio.checked = true;
-        radio.setAttribute("checked", "true");
+      input.addEventListener("change", () => {
+        progress[qIndex] = oIndex;
+        sessionStorage.setItem("progress", JSON.stringify(progress));
       });
 
-      label.appendChild(radio);
-      label.appendChild(document.createTextNode(opt));
-
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(option));
       qDiv.appendChild(label);
       qDiv.appendChild(document.createElement("br"));
     });
@@ -88,12 +73,12 @@ function renderQuestions() {
   });
 }
 
-// Submit quiz
+// ---------------- SUBMIT QUIZ ----------------
 submitBtn.addEventListener("click", () => {
   let score = 0;
 
-  questions.forEach((q, i) => {
-    if (savedProgress[i] == q.correct) {
+  quizData.forEach((q, index) => {
+    if (progress[index] == q.answer) {
       score++;
     }
   });
@@ -102,11 +87,11 @@ submitBtn.addEventListener("click", () => {
   localStorage.setItem("score", score);
 });
 
-// Initial render
-renderQuestions();
-
-// Restore score after refresh
+// ---------------- LOAD STORED SCORE ----------------
 const storedScore = localStorage.getItem("score");
 if (storedScore !== null) {
   scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
 }
+
+// Initial render
+renderQuestions();
