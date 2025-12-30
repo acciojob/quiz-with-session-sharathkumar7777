@@ -1,26 +1,22 @@
-// Correct answers (can be anything – Cypress does not validate which option is correct)
 const correctAnswers = {
-  q1: "a",
-  q2: "b",
-  q3: "c",
-  q4: "d",
-  q5: "a"
+  q1: "Paris",
+  q2: "JavaScript",
+  q3: "Hyper Text Markup Language",
+  q4: "1995",
+  q5: "Netscape"
 };
 
-// Load progress from sessionStorage
+// Restore selections
 window.addEventListener("load", () => {
-  const savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
+  const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
-  for (const question in savedProgress) {
+  for (let q in progress) {
     const radio = document.querySelector(
-      `input[name="${question}"][value="${savedProgress[question]}"]`
+      `input[name="${q}"][value="${progress[q]}"]`
     );
-    if (radio) {
-      radio.checked = true;
-    }
+    if (radio) radio.checked = true;
   }
 
-  // Load score from localStorage if exists
   const savedScore = localStorage.getItem("score");
   if (savedScore !== null) {
     document.getElementById("score").textContent =
@@ -28,8 +24,8 @@ window.addEventListener("load", () => {
   }
 });
 
-// Save progress on selection
-document.querySelectorAll('input[type="radio"]').forEach((radio) => {
+// Save progress
+document.querySelectorAll('input[type="radio"]').forEach(radio => {
   radio.addEventListener("change", () => {
     const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
     progress[radio.name] = radio.value;
@@ -42,10 +38,8 @@ document.getElementById("submit").addEventListener("click", () => {
   const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
   let score = 0;
 
-  for (const question in correctAnswers) {
-    if (progress[question] === correctAnswers[question]) {
-      score++;
-    }
+  for (let q in correctAnswers) {
+    if (progress[q] === correctAnswers[q]) score++;
   }
 
   document.getElementById("score").textContent =
