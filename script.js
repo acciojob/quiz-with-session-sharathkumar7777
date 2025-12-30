@@ -1,49 +1,90 @@
-const correctAnswers = {
-  q1: "Paris",
-  q2: "JavaScript",
-  q3: "Hyper Text Markup Language",
-  q4: "1995",
-  q5: "Netscape"
-};
+//your JS code here.
+const questionsElement = document.getElementById("questions");
+const submitBtn = document.getElementById("submit");
+const scoreElement = document.getElementById("score");
 
-// Restore selections
-window.addEventListener("load", () => {
-  const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
+// Load saved answers from sessionStorage or initialize empty object
+let userAnswers = JSON.parse(sessionStorage.getItem("progress")) || {};
 
-  for (let q in progress) {
-    const radio = document.querySelector(
-      `input[name="${q}"][value="${progress[q]}"]`
-    );
-    if (radio) radio.checked = true;
-  }
+// Restore score from localStorage if already submitted
+const savedScore = localStorage.getItem("score");
+if (savedScore !== null) {
+  scoreElement.textContent = `Your score is ${savedScore} out of 5.`;
+}
 
-  const savedScore = localStorage.getItem("score");
-  if (savedScore !== null) {
-    document.getElementById("score").textContent =
-      `Your score is ${savedScore} out of 5.`;
+// Save selected answers using event delegation
+questionsElement.addEventListener("change", function (e) {
+  if (e.target.type === "radio") {
+    const questionIndex = e.target.name.split("-")[1];
+    userAnswers[questionIndex] = e.target.value;
+    sessionStorage.setItem("progress", JSON.stringify(userAnswers));
   }
 });
 
-// Save progress
-document.querySelectorAll('input[type="radio"]').forEach(radio => {
-  radio.addEventListener("change", () => {
-    const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
-    progress[radio.name] = radio.value;
-    sessionStorage.setItem("progress", JSON.stringify(progress));
-  });
-});
-
-// Submit quiz
-document.getElementById("submit").addEventListener("click", () => {
-  const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
+// Handle submit
+submitBtn.addEventListener("click", function () {
   let score = 0;
 
-  for (let q in correctAnswers) {
-    if (progress[q] === correctAnswers[q]) score++;
+  for (let i = 0; i < questions.length; i++) {
+    if (userAnswers[i] === questions[i].answer) {
+      score++;
+    }
   }
 
-  document.getElementById("score").textContent =
-    `Your score is ${score} out of 5.`;
-
+  scoreElement.textContent = `Your score is ${score} out of 5.`;
   localStorage.setItem("score", score);
 });
+// Do not change code below this line
+// This code will just display the questions to the screen
+const questions = [
+  {
+    question: "What is the capital of France?",
+    choices: ["Paris", "London", "Berlin", "Madrid"],
+    answer: "Paris",
+  },
+  {
+    question: "What is the highest mountain in the world?",
+    choices: ["Everest", "Kilimanjaro", "Denali", "Matterhorn"],
+    answer: "Everest",
+  },
+  {
+    question: "What is the largest country by area?",
+    choices: ["Russia", "China", "Canada", "United States"],
+    answer: "Russia",
+  },
+  {
+    question: "Which is the largest planet in our solar system?",
+    choices: ["Earth", "Jupiter", "Mars"],
+    answer: "Jupiter",
+  },
+  {
+    question: "What is the capital of Canada?",
+    choices: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
+    answer: "Ottawa",
+  },
+];
+
+// Display the quiz questions and choices
+function renderQuestions() {
+  for (let i = 0; i < questions.length; i++) {
+    const question = questions[i];
+    const questionElement = document.createElement("div");
+    const questionText = document.createTextNode(question.question);
+    questionElement.appendChild(questionText);
+    for (let j = 0; j < question.choices.length; j++) {
+      const choice = question.choices[j];
+      const choiceElement = document.createElement("input");
+      choiceElement.setAttribute("type", "radio");
+      choiceElement.setAttribute("name", `question-${i}`);
+      choiceElement.setAttribute("value", choice);
+      if (userAnswers[i] === choice) {
+        choiceElement.setAttribute("checked", true);
+      }
+      const choiceText = document.createTextNode(choice);
+      questionElement.appendChild(choiceElement);
+      questionElement.appendChild(choiceText);
+    }
+    questionsElement.appendChild(questionElement);
+  }
+}
+renderQuestions();
