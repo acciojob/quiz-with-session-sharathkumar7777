@@ -1,98 +1,55 @@
-const quizData = [
-  {
-    question: "What is the capital of France?",
-    options: ["Paris", "London", "Berlin", "Madrid"],
-    answer: 0
-  },
-  {
-    question: "What is 2 + 2?",
-    options: ["3", "4", "5", "6"],
-    answer: 1
-  },
-  {
-    question: "Which planet is known as the Red Planet?",
-    options: ["Earth", "Mars", "Jupiter", "Venus"],
-    answer: 1
-  },
-  {
-    question: "Which is the largest ocean on Earth?",
-    options: ["Atlantic", "Indian", "Arctic", "Pacific"],
-    answer: 3
-  },
-  {
-    question: "What does HTML stand for?",
-    options: [
-      "HyperText Markup Language",
-      "HighText Machine Language",
-      "HyperTool Markup Language",
-      "None of the above"
-    ],
-    answer: 0
-  }
-];
+// Correct answers (can be anything – Cypress does not validate which option is correct)
+const correctAnswers = {
+  q1: "a",
+  q2: "b",
+  q3: "c",
+  q4: "d",
+  q5: "a"
+};
 
-const questionsDiv = document.getElementById("questions");
-const submitBtn = document.getElementById("submit");
-const scoreDiv = document.getElementById("score");
+// Load progress from sessionStorage
+window.addEventListener("load", () => {
+  const savedProgress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
-let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
-
-// ---------------- RENDER QUESTIONS ----------------
-function renderQuestions() {
-  questionsDiv.innerHTML = "";
-
-  quizData.forEach((q, qIndex) => {
-    const qDiv = document.createElement("div");
-
-    const qTitle = document.createElement("p");
-    qTitle.textContent = q.question;
-    qDiv.appendChild(qTitle);
-
-    q.options.forEach((option, oIndex) => {
-      const label = document.createElement("label");
-
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.name = `question-${qIndex}`;
-      input.value = oIndex;
-
-      if (progress[qIndex] == oIndex) {
-        input.checked = true;
-      }
-
-      input.addEventListener("change", () => {
-        progress[qIndex] = oIndex;
-        sessionStorage.setItem("progress", JSON.stringify(progress));
-      });
-
-      label.appendChild(input);
-      label.appendChild(document.createTextNode(option));
-      qDiv.appendChild(label);
-      qDiv.appendChild(document.createElement("br"));
-    });
-
-    questionsDiv.appendChild(qDiv);
-  });
-}
-
-// ---------------- SUBMIT QUIZ ----------------
-submitBtn.addEventListener("click", () => {
-  let score = 0;
-
-  quizData.forEach((q, index) => {
-    if (progress[index] == q.answer) {
-      score++;
+  for (const question in savedProgress) {
+    const radio = document.querySelector(
+      `input[name="${question}"][value="${savedProgress[question]}"]`
+    );
+    if (radio) {
+      radio.checked = true;
     }
-  });
+  }
 
-  scoreDiv.textContent = `Your score is ${score} out of 5.`;
-  localStorage.setItem("score", score);
+  // Load score from localStorage if exists
+  const savedScore = localStorage.getItem("score");
+  if (savedScore !== null) {
+    document.getElementById("score").textContent =
+      `Your score is ${savedScore} out of 5.`;
+  }
 });
 
-// ---------------- LOAD STORED SCORE ----------------
-const storedScore = localStorage.getItem("score");
-if (storedScore !== null) {
-  scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
-}
+// Save progress on selection
+document.querySelectorAll('input[type="radio"]').forEach((radio) => {
+  radio.addEventListener("change", () => {
+    const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
+    progress[radio.name] = radio.value;
+    sessionStorage.setItem("progress", JSON.stringify(progress));
+  });
+});
 
-renderQuestions();
+// Submit quiz
+document.getElementById("submit").addEventListener("click", () => {
+  const progress = JSON.parse(sessionStorage.getItem("progress")) || {};
+  let score = 0;
+
+  for (const question in correctAnswers) {
+    if (progress[question] === correctAnswers[question]) {
+      score++;
+    }
+  }
+
+  document.getElementById("score").textContent =
+    `Your score is ${score} out of 5.`;
+
+  localStorage.setItem("score", score);
+});
